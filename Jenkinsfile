@@ -1,12 +1,11 @@
 pipeline {
-    agent {
-        dockerContainer {
-            image 'maven:3.9.5-jdk-17' // Utilise une image Docker avec Maven et Java 17
-        }
+    agent any
+    tools {
+        maven 'Maven 3.9.9' 
     }
-    environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials') // Injecte les credentials Docker Hub
-        DOCKER_IMAGE = "zainabjinari/demo_app_pipeline:latest" // Nom de l'image Docker
+     environment {
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials') 
+        DOCKER_IMAGE = "zainabjinari/demo_app_pipeline:latest"
     }
     stages {
         stage('Checkout') {
@@ -17,32 +16,35 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'mvn test' // Exécute les tests avec Maven
+                sh 'mvn test'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${env.DOCKER_IMAGE} ." // Construit l'image Docker
+                   
+                    sh "docker build -t ${env.DOCKER_IMAGE} ."
                 }
             }
         }
-
         stage('Login to Docker Hub') {
             steps {
                 script {
-                    sh "echo ${env.DOCKER_HUB_CREDENTIALS_PSW} | docker login -u ${env.DOCKER_HUB_CREDENTIALS_USR} --password-stdin" // Se connecte à Docker Hub
+                  
+                    sh "echo ${env.DOCKER_HUB_CREDENTIALS_PSW} | docker login -u ${env.DOCKER_HUB_CREDENTIALS_USR} --password-stdin"
+                }
+            }
+        }
+        stage('Deply in  Docker Hub') {
+            steps {
+                script {
+                   
+                    sh "docker push ${env.DOCKER_IMAGE}"
                 }
             }
         }
 
-        stage('Deploy to Docker Hub') {
-            steps {
-                script {
-                    sh "docker push ${env.DOCKER_IMAGE}" // Pousse l'image Docker sur Docker Hub
-                }
-            }
-        }
+       
     }
 }
