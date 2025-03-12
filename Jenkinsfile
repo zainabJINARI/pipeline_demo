@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        docker {
+        docker-cloud {
             image 'maven:3.9.5-jdk-17' // Utilise une image Docker avec Maven et Java 17
             args '-v /var/jenkins_home:/var/jenkins_home' // Monte un volume si nécessaire
         }
